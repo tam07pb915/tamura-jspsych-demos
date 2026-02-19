@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Semantic Priming Experiment</title>
+  <script src="https://unpkg.com/jspsych@7.3.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.2"></script>
+
+  <link href="https://unpkg.com/jspsych@7.3.3/css/jspsych.css" rel="stylesheet" type="text/css" />
+</head>
+<body></body>
+<script>
+// Initialize jsPsych
+const jsPsych = initJsPsych({
+  on_finish: function() {
+    jsPsych.data.displayData();
+  }
+});
+
+// Timeline definition
+const timeline = [];
+
+// Instructions
+const instructions = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: '<div style="width: 700px; text-align: left;">' +
+            '<p>これから意味的プライミング課題を体験してもらいます。</p>' +
+            '<p>画面に2つの単語が短い間隔で連続して表示されます。</p>' +
+            '<p>1つ目に表示される単語は無視してください。</p>' +
+            '<p><strong>2つ目に表示される単語</strong>が、英語として実在する単語かどうかを判断してください。</p>' +
+            '<ul>' +
+            '<li>実在する単語の場合: <strong>Fキー</strong> を押します。</li>' +
+            '<li>実在しない単語の場合: <strong>Jキー</strong> を押します。</li>' +
+            '</ul>' +
+            '<p>なるべく速く正確に反応してください。</p>' +
+            '<p>まず練習を4回行います。スペースキーを押すと練習を開始します。</p>' +
+            '</div>',
+  choices: [' ']
+};
+timeline.push(instructions);
+
+// Practice pairs
+const practicePairs = [
+  { prime: 'apple', target: 'fruit', relation: 'related' },
+  { prime: 'dog', target: 'table', relation: 'unrelated' },
+  { prime: 'wux', target: 'mib', relation: 'nonword' },
+  { prime: 'bleen', target: 'fost', relation: 'nonword' }
+];
+
+// Practice feedback
+const practice_feedback = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: function() {
+        const last_trial_data = jsPsych.data.getLastTrialData().values()[0];
+        if (last_trial_data.correct) {
+            return '<p style="font-size: 36px; color: green;">正解</p>';
+        } else {
+            return '<p style="font-size: 36px; color: red;">間違い</p>';
+        }
+    },
+    choices: "NO_KEYS",
+    trial_duration: 1000
+};
+
+// Practice procedure
+const practice_procedure = {
+  timeline: [
+    {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        return `<div style="font-size:36px; text-align:center; line-height:1.5;">${jsPsych.timelineVariable('prime')}</div>`;
+      },
+      prompt: '<p>実在する単語ならFキー、実在しない単語ならJキーを押してください。</p>',
+      choices: "NO_KEYS",
+      trial_duration: 500
+    },
+    {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="font-size:36px; text-align:center; line-height:1.5;">&nbsp;</div>',
+      prompt: '<p>実在する単語ならFキー、実在しない単語ならJキーを押してください。</p>',
+      choices: "NO_KEYS",
+      trial_duration: 200
+    },
+    {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        return `<div style="font-size:36px; text-align:center; line-height:1.5;">${jsPsych.timelineVariable('target')}</div>`;
+      },
+      choices: ['f', 'j'],
+      prompt: '<p>実在する単語ならFキー、実在しない単語ならJキーを押してください。</p>',
+      data: function() {
+        return {
+          prime: jsPsych.timelineVariable('prime'),
+          target: jsPsych.timelineVariable('target'),
+          relation: jsPsych.timelineVariable('relation'),
+          task: 'practice'
+        };
+      },
+      on_finish: function(data) {
+        let correct_key;
+        if (data.relation === 'nonword') {
+          correct_key = 'j';
+        } else {
+          correct_key = 'f';
+        }
+        data.correct = jsPsych.pluginAPI.compareKeys(data.response, correct_key);
+      }
+    },
+    practice_feedback
+  ],
+  timeline_variables: practicePairs,
+  randomize_order: true
+};
+timeline.push(practice_procedure);
+
+// Start main trials screen
+const start_main_trials = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: '<p>練習は終わりです。</p>' +
+            '<p>これから本番です。本番ではフィードバック（正解・間違い）は表示されません。</p>' +
+            '<p>スペースキーを押して開始します。</p>',
+  choices: [' ']
+};
+timeline.push(start_main_trials);
+
+// --- 修正: 本番試行の単語ペア (Related: 6, Unrelated: 6, Nonword: 12 = Total 24) ---
+const primeTargetPairs = [
+  // Related (6 items)
+  { prime: 'doctor', target: 'nurse', relation: 'related' },
+  { prime: 'bread', target: 'butter', relation: 'related' },
+  { prime: 'king', target: 'queen', relation: 'related' },
+  { prime: 'cat', target: 'dog', relation: 'related' },
+  { prime: 'salt', target: 'pepper', relation: 'related' },
+  { prime: 'day', target: 'night', relation: 'related' },
+
+  // Unrelated (6 items)
+  { prime: 'book', target: 'car', relation: 'unrelated' },
+  { prime: 'sky', target: 'computer', relation: 'unrelated' },
+  { prime: 'chair', target: 'moon', relation: 'unrelated' },
+  { prime: 'river', target: 'lamp', relation: 'unrelated' },
+  { prime: 'shoe', target: 'banana', relation: 'unrelated' },
+  { prime: 'tree', target: 'boat', relation: 'unrelated' },
+
+  // Nonword (12 items)
+  { prime: 'narp', target: 'flib', relation: 'nonword' },
+  { prime: 'glorp', target: 'blat', relation: 'nonword' },
+  { prime: 'snarp', target: 'plim', relation: 'nonword' },
+  { prime: 'trax', target: 'zib', relation: 'nonword' },
+  { prime: 'vonk', target: 'drim', relation: 'nonword' },
+  { prime: 'quop', target: 'snib', relation: 'nonword' },
+  { prime: 'plook', target: 'fleep', relation: 'nonword' },
+  { prime: 'zork', target: 'greeb', relation: 'nonword' },
+  { prime: 'slint', target: 'vope', relation: 'nonword' },
+  { prime: 'flum', target: 'jip', relation: 'nonword' },
+  { prime: 'kreb', target: 'nol', relation: 'nonword' },
+  { prime: 'mip', target: 'wug', relation: 'nonword' }
+];
+
+// --- 修正: 単純なシャッフルに変更 ---
+// (jsPsych.randomization.shuffle は v7 のコアに含まれています)
+const shuffledTrials = jsPsych.randomization.shuffle(primeTargetPairs);
+
+// --- 修正: 本番試行のプロシージャ ---
+const trial_procedure = {
+  timeline: [
+    {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        return `<div style="font-size:36px; text-align:center; line-height:1.5;">${jsPsych.timelineVariable('prime')}</div>`;
+      },
+      prompt: '<p>実在する単語ならFキー、実在しない単語ならJキーを押してください。</p>',
+      choices: "NO_KEYS",
+      trial_duration: 500
+    },
+    {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="font-size:36px; text-align:center; line-height:1.5;">&nbsp;</div>',
+      prompt: '<p>実在する単語ならFキー、実在しない単語ならJキーを押してください。</p>',
+      choices: "NO_KEYS",
+      trial_duration: 200
+    },
+    {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        return `<div style="font-size:36px; text-align:center; line-height:1.5;">${jsPsych.timelineVariable('target')}</div>`;
+      },
+      choices: ['f', 'j'],
+      prompt: '<p>実在する単語ならFキー、実在しない単語ならJキーを押してください。</p>',
+      data: function() {
+        return {
+          prime: jsPsych.timelineVariable('prime'),
+          target: jsPsych.timelineVariable('target'),
+          relation: jsPsych.timelineVariable('relation'),
+          task: 'response'
+        };
+      }
+    }
+  ],
+  timeline_variables: shuffledTrials, // シャッフル済みリストを使用
+  randomize_order: false // シャッフル済みのため false に変更
+};
+timeline.push(trial_procedure);
+
+// --- 修正: Debriefing (計算ロジックの修正) ---
+const debrief = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: function() {
+    // 本番試行 (task: 'response') のみを取得
+    const data = jsPsych.data.get().filter({ task: 'response' });
+
+    // --- 実在語の分析 ---
+    // (relation が 'related' または 'unrelated' の試行)
+    const allRealWords = data.filterCustom(trial => trial.relation === 'related' || trial.relation === 'unrelated');
+    
+    // (上記のうち、正解 'f' キーを押したもの)
+    const correctRealWords = allRealWords.filter({ response: 'f' });
+
+    // (正解試行を条件別に絞り込み)
+    const relatedTrials = correctRealWords.filter({ relation: 'related' });
+    const unrelatedTrials = correctRealWords.filter({ relation: 'unrelated' });
+
+    // (それぞれの平均RTを計算)
+    const meanRTRelated = Math.round(relatedTrials.select('rt').mean());
+    const meanRTUnrelated = Math.round(unrelatedTrials.select('rt').mean());
+    const primingEffect = meanRTUnrelated - meanRTRelated;
+
+    // (実在語の正解率)
+    const accuracyRealWords = allRealWords.count() > 0 ?
+        Math.round((correctRealWords.count() / allRealWords.count()) * 100) : 0;
+
+    // --- 非実在語の分析 ---
+    // (relation が 'nonword' の試行)
+    const allNonwords = data.filter({ relation: 'nonword' });
+    
+    // (上記のうち、正解 'j' キーを押したもの)
+    const correctNonwords = allNonwords.filter({ response: 'j' });
+    
+    // (平均RTを計算)
+    const meanRTNonword = Math.round(correctNonwords.select('rt').mean());
+
+    // (非実在語の正解率)
+    const accuracyNonwords = allNonwords.count() > 0 ?
+        Math.round((correctNonwords.count() / allNonwords.count()) * 100) : 0;
+
+    // 結果の表示
+    return '<p>これで意味的プライミング課題は終了です。</p>' +
+           '<p><strong>【実在語】</strong></p>' +
+           '<p>関連のある単語ペアでの平均反応時間: ' + meanRTRelated + ' ms</p>' +
+           '<p>関連のない単語ペアでの平均反応時間: ' + meanRTUnrelated + ' ms</p>' +
+           '<p>意味的プライミング効果: ' + primingEffect + ' ms</p>' +
+           '<p>正解率: ' + accuracyRealWords + '%</p>' +
+           '<p><strong>【非実在語】</strong></p>' +
+           '<p>平均反応時間: ' + meanRTNonword + ' ms</p>' +
+           '<p>正解率: ' + accuracyNonwords + '%</p>' +
+           '<p>ご協力ありがとうございました。</p>' +
+           '<p>関連のある単語ペアでは、関連のない単語ペアよりも速く反応する傾向が見られたでしょうか？</p>' +
+           '<p>もしそうであれば、これは意味的プライミング効果と呼ばれ、語彙処理における意味的関連性の影響を示しています。</p>' +
+           '<p>スペースキーを押して終了します。</p>';
+  },
+  choices: [' ']
+};
+timeline.push(debrief);
+
+// Start experiment
+jsPsych.run(timeline);
+</script>
+</html>

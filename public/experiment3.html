@@ -1,0 +1,27 @@
+<!DOCTYPE html> <html>
+<head>
+<title>Online Experiment</title>
+<!--ここに jsPsych からインポートするプラグインのリストを入れます-->
+<script src="https://unpkg.com/jspsych@7.3.3"></script><!--とりあえず本体-->
+<script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2"></script><!--キーボード反応をとるやつ-->
+<script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.1.2"></script><!--フルスクリーン-->
+<link href="./jspsych/jspsych.css" rel="stylesheet" type="text/css" /><!--css スタイルシート--> </head>
+<body></body><!--画面に表示されるものは下の script の中身で操作するので body に内容は要りません-->
+
+
+<script>
+const jsPsych = initJsPsych();
+
+    var timeline = [{
+        type: 'html-keyboard-response',
+        stimulus: 'Does this message show up? Press any key.'
+    }];
+
+    initJsPsych({
+        timeline: timeline,
+        on_finish: function() {
+            alert('End of basic test.');
+        }
+    });
+</script>
+</html>

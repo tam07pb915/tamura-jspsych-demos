@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Masked Morphological Priming Task (Counterbalanced)</title>
+  <script src="https://unpkg.com/jspsych@7.3.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2"></script>
+  <link href="https://unpkg.com/jspsych@7.3.3/css/jspsych.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<script>
+// initialize jsPsych
+const jsPsych = initJsPsych({
+  on_finish: () => jsPsych.data.displayData()
+});
+
+// timeline
+const timeline = [];
+
+// Instructions
+timeline.push({
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: `<p>これからマスク付きプライミング課題を行います。</p>
+             <p>刺激リストが2種類あり、あなたはランダムにどちらかのリストに割り当てられました。</p>
+             <p><b>プライム(#######に挟まれる単語)は小文字</b>で一瞬表示されます。</p>
+             <p>その後に表示される<b>ターゲット単語(大文字)</b>について、</p>
+             <p>英語として実在する単語の場合は<b>Fキー</b>、非実在語の場合は<b>Jキー</b>を押してください。</p>
+             <p>準備ができたらスペースキーを押してください。</p>`,
+  choices: [' ']
+});
+
+// --- Stimuli Lists (Counterbalanced) ---
+// 16 target words per list: 8 morphological / 8 unrelated
+
+// List A: Morphological condition
+const list_A_stimuli = [
+  // Morphological pairs (8 items)
+  { prime: 'hunter',   target: 'hunt',   condition: 'morphological' },
+  { prime: 'teacher',  target: 'teach',  condition: 'morphological' },
+  { prime: 'player',   target: 'play',   condition: 'morphological' },
+  { prime: 'reader',   target: 'read',   condition: 'morphological' },
+  { prime: 'walker',   target: 'walk',   condition: 'morphological' },
+  { prime: 'builder',  target: 'build',  condition: 'morphological' },
+  { prime: 'fighter',  target: 'fight',  condition: 'morphological' },
+  { prime: 'dancer',   target: 'dance',  condition: 'morphological' },
+
+  // Unrelated pairs (8 items)
+  { prime: 'cloud',    target: 'work',   condition: 'unrelated' },
+  { prime: 'bread',    target: 'sing',   condition: 'unrelated' },
+  { prime: 'table',    target: 'bake',   condition: 'unrelated' },
+  { prime: 'river',    target: 'clean',  condition: 'unrelated' },
+  { prime: 'garden',   target: 'write',  condition: 'unrelated' },
+  { prime: 'bottle',   target: 'paint',  condition: 'unrelated' },
+  { prime: 'carpet',   target: 'think',  condition: 'unrelated' },
+  { prime: 'pocket',   target: 'sleep',  condition: 'unrelated' },
+];
+
+// List B: Counterbalanced
+const list_B_stimuli = [
+  // Unrelated pairs (8 items - using targets from List A morphological)
+  { prime: 'window',   target: 'hunt',   condition: 'unrelated' },
+  { prime: 'doctor',   target: 'teach',  condition: 'unrelated' },
+  { prime: 'music',    target: 'play',   condition: 'unrelated' },
+  { prime: 'pencil',   target: 'read',   condition: 'unrelated' },
+  { prime: 'flower',   target: 'walk',   condition: 'unrelated' },
+  { prime: 'coffee',   target: 'build',  condition: 'unrelated' },
+  { prime: 'butter',   target: 'fight',  condition: 'unrelated' },
+  { prime: 'silver',   target: 'dance',  condition: 'unrelated' },
+
+  // Morphological pairs (8 items - using targets from List A unrelated)
+  { prime: 'worker',   target: 'work',   condition: 'morphological' },
+  { prime: 'singer',   target: 'sing',   condition: 'morphological' },
+  { prime: 'baker',    target: 'bake',   condition: 'morphological' },
+  { prime: 'cleaner',  target: 'clean',  condition: 'morphological' },
+  { prime: 'writer',   target: 'write',  condition: 'morphological' },
+  { prime: 'painter',  target: 'paint',  condition: 'morphological' },
+  { prime: 'thinker',  target: 'think',  condition: 'morphological' },
+  { prime: 'sleeper',  target: 'sleep',  condition: 'morphological' },
+];
+
+// Nonword trials - split into List A and List B
+// List A用の非実在語 16個
+const nonword_A_stimuli = [
+  { prime: 'candle',   target: 'hunct',   condition: 'nonword' },
+  { prime: 'forest',   target: 'turch',   condition: 'nonword' },
+  { prime: 'market',   target: 'plaim',   condition: 'nonword' },
+  { prime: 'winter',   target: 'reath',   condition: 'nonword' },
+  { prime: 'summer',   target: 'wulch',   condition: 'nonword' },
+  { prime: 'spring',   target: 'brypt',   condition: 'nonword' },
+  { prime: 'autumn',   target: 'fenth',   condition: 'nonword' },
+  { prime: 'planet',   target: 'dulth',   condition: 'nonword' },
+  { prime: 'branch',   target: 'grulp',   condition: 'nonword' },
+  { prime: 'mirror',   target: 'stelch',  condition: 'nonword' },
+  { prime: 'copper',   target: 'blonth',  condition: 'nonword' },
+  { prime: 'ribbon',   target: 'prulm',   condition: 'nonword' },
+  { prime: 'velvet',   target: 'dwinth',  condition: 'nonword' },
+  { prime: 'marble',   target: 'fralp',   condition: 'nonword' },
+  { prime: 'cotton',   target: 'thulch',  condition: 'nonword' },
+  { prime: 'trophy',   target: 'slenth',  condition: 'nonword' },
+];
+
+// List B用の非実在語 16個
+const nonword_B_stimuli = [
+  { prime: 'castle',   target: 'frelp',   condition: 'nonword' },
+  { prime: 'dragon',   target: 'blath',   condition: 'nonword' },
+  { prime: 'puzzle',   target: 'plond',   condition: 'nonword' },
+  { prime: 'sunset',   target: 'nulch',   condition: 'nonword' },
+  { prime: 'temple',   target: 'wrelk',   condition: 'nonword' },
+  { prime: 'jungle',   target: 'bralm',   condition: 'nonword' },
+  { prime: 'desert',   target: 'fulth',   condition: 'nonword' },
+  { prime: 'salmon',   target: 'drinth',  condition: 'nonword' },
+  { prime: 'pirate',   target: 'splanch', condition: 'nonword' },
+  { prime: 'palace',   target: 'glenth',  condition: 'nonword' },
+  { prime: 'canyon',   target: 'brinch',  condition: 'nonword' },
+  { prime: 'orchid',   target: 'trawlp',  condition: 'nonword' },
+  { prime: 'beacon',   target: 'flumth',  condition: 'nonword' },
+  { prime: 'parrot',   target: 'screlp',  condition: 'nonword' },
+  { prime: 'gazebo',   target: 'drintch', condition: 'nonword' },
+  { prime: 'galaxy',   target: 'plunth',  condition: 'nonword' },
+];
+
+// --- Randomly assign to List A or List B ---
+let final_stimuli = [];
+const assignedList = (Math.random() < 0.5) ? 'A' : 'B';
+
+if (assignedList === 'A') {
+  final_stimuli = list_A_stimuli.concat(nonword_A_stimuli);
+} else {
+  final_stimuli = list_B_stimuli.concat(nonword_B_stimuli);
+}
+
+// Add data about which list was used
+jsPsych.data.addProperties({list: assignedList});
+
+// jsPsych組み込みのshuffleNoRepeats関数を使用
+// 同じ実在語条件（morphological/unrelated）が連続しないようにする
+// 非実在語は連続してもOK（32試行あるため完全回避は不可能）
+final_stimuli = jsPsych.randomization.shuffleNoRepeats(final_stimuli, function(a, b) {
+  // 両方が実在語で、かつ同じ条件の場合にtrueを返す
+  return (a.condition !== 'nonword' && a.condition === b.condition);
+});
+
+// Trial procedure
+const trial = {
+  timeline: [
+    // fixation
+    {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="font-size:60px; font-family: monospace; min-width: 300px; height: 80px; line-height: 80px; display: inline-block;">+</div>',
+      choices: 'NO_KEYS',
+      trial_duration: 500,
+      prompt: '<p style="visibility: hidden;">実在語ならFキー，非実在語ならJキーを押してください。</p>'
+    },
+    // forward mask
+    {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="font-size:60px; font-family: monospace; min-width: 300px; height: 80px; line-height: 80px; display: inline-block;">#######</div>',
+      choices: 'NO_KEYS',
+      trial_duration: 500,
+      prompt: '<p style="visibility: hidden;">実在語ならFキー，非実在語ならJキーを押してください。</p>'
+    },
+    // prime (brief & lowercase)
+    {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: jsPsych.timelineVariable('prime'),
+      on_start: function(trial) {
+        trial.stimulus = '<div style="font-size:60px; font-family: monospace; min-width: 300px; height: 80px; line-height: 80px; display: inline-block;">' + trial.stimulus.toLowerCase() + '</div>';
+      },
+      choices: 'NO_KEYS',
+      trial_duration: 40,
+      prompt: '<p style="visibility: hidden;">実在語ならFキー，非実在語ならJキーを押してください。</p>'
+    },
+    // backward mask
+    {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="font-size:60px; font-family: monospace; min-width: 300px; height: 80px; line-height: 80px; display: inline-block;">#######</div>',
+      choices: 'NO_KEYS',
+      trial_duration: 50,
+      prompt: '<p style="visibility: hidden;">実在語ならFキー，非実在語ならJキーを押してください。</p>'
+    },
+    // target (uppercase) & lexical decision
+    {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: jsPsych.timelineVariable('target'),
+      on_start: function(trial) {
+        trial.stimulus = '<div style="font-size:60px; font-family: monospace; min-width: 300px; height: 80px; line-height: 80px; display: inline-block;">' + trial.stimulus.toUpperCase() + '</div>';
+      },
+      choices: ['f','j'],
+      prompt: '<p>実在語ならFキー，非実在語ならJキーを押してください。</p>',
+      data: {
+        condition: jsPsych.timelineVariable('condition'),
+        prime: jsPsych.timelineVariable('prime'),
+        target: jsPsych.timelineVariable('target'),
+        task: 'lexical_decision'
+      },
+      on_finish: function(data) {
+        const isRealWord = data.condition === 'morphological' || data.condition === 'unrelated';
+        const correct_key = isRealWord ? 'f' : 'j';
+        data.correct = (data.response === correct_key);
+      }
+    }
+  ],
+  timeline_variables: final_stimuli,
+  randomize_order: false  // カスタムランダマイズを使用するためfalseに設定
+};
+timeline.push(trial);
+
+// Debrief
+timeline.push({
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: function() {
+    const data = jsPsych.data.get();
+    const list = jsPsych.data.getLastTrialData().values()[0].list;
+
+    // ターゲット試行だけ
+    const targets = data.filter({ task: 'lexical_decision' });
+
+    // 実在語
+    const morph = targets.filter({ condition: 'morphological' });
+    const unrel = targets.filter({ condition: 'unrelated' });
+
+    const morph_F = morph.filter({ response: 'f' });
+    const unrel_F = unrel.filter({ response: 'f' });
+
+    const meanMorphological = morph_F.select('rt').mean().toFixed(1);
+    const meanUnrelated = unrel_F.select('rt').mean().toFixed(1);
+
+    const primingEffect = (isNaN(meanUnrelated) || isNaN(meanMorphological))
+      ? 'N/A'
+      : (meanUnrelated - meanMorphological).toFixed(1);
+
+    // 非実在語
+    const nonwords = targets.filter({ condition: 'nonword' });
+    const nonword_J = nonwords.filter({ response: 'j' });
+
+    const meanNonwordRaw = nonword_J.select('rt').mean();
+    const meanNonword = isNaN(meanNonwordRaw)
+      ? 'N/A'
+      : meanNonwordRaw.toFixed(1);
+
+    // 正答率
+    const correctRealWordsAcc = morph.filter({ correct: true }).count() + unrel.filter({ correct: true }).count();
+    const totalRealWords = morph.count() + unrel.count();
+    const accuracyRealWords = totalRealWords > 0
+      ? (correctRealWordsAcc / totalRealWords * 100).toFixed(1)
+      : 'N/A';
+
+    const correctNonwordsAcc = nonwords.filter({ correct: true }).count();
+    const totalNonwords = nonwords.count();
+    const accuracyNonwords = totalNonwords > 0
+      ? (correctNonwordsAcc / totalNonwords * 100).toFixed(1)
+      : 'N/A';
+
+    return `<p>課題終了です。(あなたは <b>List ${list}</b> に割り当てられました)</p>
+            <p>【実在語の判断結果】(各条件8語)</p>
+            <p><b>形態的関連 (Morphological) 条件</b> (例: hunter → HUNT) の平均反応時間: <b>${meanMorphological} ms</b></p>
+            <p><b>非関連 (Unrelated) 条件</b> (例: window → HUNT) の平均反応時間: <b>${meanUnrelated} ms</b></p>
+            <p>実在語判断の正答率: <b>${accuracyRealWords}%</b> (${correctRealWordsAcc}/${totalRealWords})</p>
+            <hr>
+            <p><b>形態的プライミング効果: ${primingEffect} ms</b></p>
+            <p>(形態的関連条件のRTが非関連条件より短ければ、マスクされたプライムが無意識に語幹へ分解されたことを示唆します)</p>
+            <br>
+            <p>【非実在語の判断結果】(16語)</p>
+            <p>Nonword条件の平均反応時間: ${meanNonword} ms</p>
+            <p>非実在語判断の正答率: <b>${accuracyNonwords}%</b> (${correctNonwordsAcc}/${totalNonwords})</p>
+            <br>
+            <p>ご協力ありがとうございました。スペースキーで終了します。</p>`;
+  },
+  choices: [' ']
+});
+
+// start
+jsPsych.run(timeline);
+</script>
+</body>
+</html>

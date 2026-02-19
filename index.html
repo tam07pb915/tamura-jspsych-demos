@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心理言語学実験デモ集</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            line-height: 1.7;
+            color: #2c3e50;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 50px 45px;
+        }
+
+        header {
+            margin-bottom: 45px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #1a3a52;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            font-size: 1em;
+            color: #6c757d;
+            font-weight: 400;
+        }
+
+        .intro {
+            background: #f8f9fa;
+            padding: 18px 22px;
+            border-radius: 3px;
+            margin-bottom: 40px;
+            border-left: 3px solid #1a3a52;
+            font-size: 0.95em;
+            line-height: 1.7;
+        }
+
+        .section-title {
+            font-size: 1.35em;
+            color: #1a3a52;
+            margin: 40px 0 20px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .demo-card {
+            background: #fafbfc;
+            border: 1px solid #d1d9e0;
+            border-radius: 3px;
+            padding: 22px;
+            transition: all 0.2s ease;
+        }
+
+        .demo-card:hover {
+            background: white;
+            border-color: #1a3a52;
+            box-shadow: 0 2px 6px rgba(26, 58, 82, 0.12);
+        }
+
+        .demo-card h3 {
+            color: #1a3a52;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .demo-card p {
+            color: #495057;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .demo-card a {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e9ecef;
+            color: #495057;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 25px;
+            border-top: 1px solid #e1e8ed;
+            color: #6c757d;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 25px;
+            }
+
+            h1 {
+                font-size: 1.7em;
+            }
+
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 心理言語学実験デモ集</h1>
+            <p class="subtitle">Psycholinguistics Experiment Demos with jsPsych</p>
+        </header>
+
+        <div class="intro">
+            <p>このサイトでは、心理言語学の授業で使用する様々な実験パラダイムのデモを公開しています。各実験は jsPsych を用いて実装されており、実際にブラウザ上で体験することができます。</p>
+        </div>
+
+        <h2 class="section-title">📚 プライミング実験</h2>
+        <div class="demo-grid">
+            <div class="demo-card">
+                <a href="masked-priming_morphological-demo.html">
+                    <h3>マスク付き形態的プライミング</h3>
+                    <p>プライムとターゲットの形態的関連性が語彙判断に与える影響を検討する実験です。</p>
+                    <span class="tag">Masked Priming</span>
+                </a>
+            </div>
+
+            <div class="demo-card">
+                <a href="masked-priming-demo.html">
+                    <h3>マスク付きプライミング基礎</h3>
+                    <p>マスク付きプライミングパラダイムの基本的な実装デモです。</p>
+                    <span class="tag">Masked Priming</span>
+                </a>
+            </div>
+
+            <div class="demo-card">
+                <a href="semantic-priming-demo.html">
+                    <h3>意味的プライミング</h3>
+                    <p>意味的に関連する単語ペアによるプライミング効果を検討します。</p>
+                    <span class="tag">Semantic</span>
+                </a>
+            </div>
+        </div>
+
+        <h2 class="section-title">🔤 語彙処理実験</h2>
+        <div class="demo-grid">
+            <div class="demo-card">
+                <a href="word-superiority-effect-demo.html">
+                    <h3>単語優位性効果</h3>
+                    <p>単語内の文字が単独文字よりも認識されやすい現象を検証します。</p>
+                    <span class="tag">Word Recognition</span>
+                </a>
+            </div>
+
+
+        </div>
+
+        <h2 class="section-title">📖 読解実験</h2>
+<div class="demo-grid">
+    <div class="demo-card">
+        <a href="spr-demo.html">
+            <h3>英語説明付き自己ペース読み課題 (SPR)</h3>
+            <p>文処理における読み時間を計測する実験パラダイムです。説明がすべて英語で書かれています。</p>
+            <span class="tag">Reading</span>
+        </a>
+    </div>
+
+    <div class="demo-card">
+        <a href="spr-demo_jp.html">
+            <h3>日本語説明付き自己ペース読み課題 (SPR)</h3>
+            <p>文処理における読み時間を計測する実験パラダイムです。説明がすべて日本語で書かれています。読むのは英文です。</p>
+            <span class="tag">Reading</span>
+        </a>
+    </div>
+</div>
+
+<h2 class="section-title">🧩 その他の実験</h2>
+<div class="demo-grid">
+    <div class="demo-card">
+        <a href="color-demo.html">
+            <h3>色彩実験デモ</h3>
+            <p>色彩知覚や色名に関する認知実験のデモです。</p>
+            <span class="tag">Perception</span>
+        </a>
+    </div>
+
+    <div class="demo-card">
+        <a href="time-metaphors.html">
+            <h3>時間のメタファー</h3>
+            <p>時間概念の比喩的理解を探る実験です。</p>
+            <span class="tag">Metaphor</span>
+        </a>
+    </div>
+</div>
+
+
+        <footer>
+    <p><strong>作成者:</strong> 関西大学外国語学部 田村祐</p>
+    <p style="margin-top: 5px;">関西大学外国語学部「心理言語学研究」授業教材</p>
+    <p style="margin-top: 10px; font-size: 0.9em;">
+        このサイトの実験デモは教育目的で作成されていますが、<br>
+        研究・教育目的での自由な利用を歓迎します。
+    </p>
+    <p style="margin-top: 15px; color: #999; font-size: 0.85em;">
+        © 2025 | Powered by jsPsych
+    </p>
+</footer>
+    </div>
+</body>
+</html>

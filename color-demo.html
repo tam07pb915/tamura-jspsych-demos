@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>色カテゴリ判断デモ（青–緑の境界）</title>
+  <script src="https://unpkg.com/jspsych@7.3.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.2.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-instructions@1.1.4"></script>
+  <link href="https://unpkg.com/jspsych@7.3.3/css/jspsych.css" rel="stylesheet" />
+  <style>
+    body { max-width: 960px; margin: 24px auto; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif; }
+    .color-box { width: 240px; height: 160px; border-radius: 12px; margin: 24px auto; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
+    .hint { color:#555; font-size: 14px; }
+    .small { color:#666; font-size: 13px; }
+    .summary { background:#f7f7f7; padding: 12px 14px; border-radius: 10px; margin-top: 20px; }
+    button.jspsych-btn { padding: 10px 16px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+<div id="jspsych-target"></div>
+
+<script>
+  function mean(arr) { return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : NaN; }
+  function sd(arr) { if (arr.length < 2) return NaN; const m = mean(arr); return Math.sqrt(arr.reduce((s,x)=>s+(x-m)*(x-m),0)/(arr.length-1)); }
+  function download(filename, text) { 
+    const a = document.createElement('a'); 
+    a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text)); 
+    a.setAttribute('download', filename); 
+    a.style.display = 'none'; 
+    document.body.appendChild(a); 
+    a.click(); 
+    document.body.removeChild(a); 
+  }
+
+  const jsPsych = initJsPsych({
+    display_element: 'jspsych-target',
+    on_finish: function() {
+      const trials = jsPsych.data.get().filter({trial_type: 'html-button-response', trial_tag: 'color_cat'}).values();
+      const easy = trials.filter(t => t.difficulty === 'easy').map(t => t.rt);
+      const boundary = trials.filter(t => t.difficulty === 'boundary').map(t => t.rt);
+      const easyM = Math.round(mean(easy)), easySD = Math.round(sd(easy));
+      const bM = Math.round(mean(boundary)), bSD = Math.round(sd(boundary));
+      const wrap = document.createElement('div');
+      wrap.className = 'summary';
+      wrap.innerHTML = `
+        <h3>結果まとめ</h3>
+        <div>試行数：${trials.length}（境界 ${boundary.length}、簡単 ${easy.length}）</div>
+        <div>平均反応時間：境界 ${bM} ms（±${bSD}）、簡単 ${easyM} ms（±${easySD}）</div>
+        <div class="small">境界色のほうが遅ければ，カテゴリ境界付近で判断に時間がかかる傾向のデモになっています。</div>
+        <div style="margin-top:10px"><button id="dlbtn" class="jspsych-btn">CSVをダウンロード</button></div>
+      `;
+      document.getElementById('jspsych-target').appendChild(wrap);
+      document.getElementById('dlbtn').addEventListener('click', () => {
+        const csv = jsPsych.data.get().csv();
+        download('color_category_demo.csv', csv);
+      });
+    }
+  });
+
+  const SAT = 70, LIG = 50;
+  const HUES_BOUNDARY = [170, 175, 185, 190];
+  const HUES_EASY = [120, 130, 140, 220, 230, 240];
+  function hueToCSS(h) { return `hsl(${h}, ${SAT}%, ${LIG}%)`; }
+  function labelFromHue(h) { return (h < 180) ? 'みどり' : 'あお'; }
+  const N_PER_SET = 8;
+  function sampleWithReplacement(arr, n) { 
+    const out=[]; 
+    for (let i=0;i<n;i++) out.push(arr[Math.floor(Math.random()*arr.length)]); 
+    return out; 
+  }
+  
+  const hues_boundary = sampleWithReplacement(HUES_BOUNDARY, N_PER_SET);
+  const hues_easy = sampleWithReplacement(HUES_EASY, N_PER_SET);
+  let trials = [];
+  hues_boundary.forEach(h => trials.push({hue: h, difficulty: 'boundary'}));
+  hues_easy.forEach(h => trials.push({hue: h, difficulty: 'easy'}));
+  trials = trials.map(v => ({ sort: Math.random(), value: v })).sort((a,b) => a.sort - b.sort).map(o => o.value);
+
+  const intro = {
+    type: jsPsychInstructions,
+    pages: [
+      `<div style="text-align:left">
+        <h2>色カテゴリ判断デモ（青–緑）</h2>
+        <p>画面中央の色を見て，できるだけ速く「あお」か「みどり」を選んでください。</p>
+        <div class="small">キー操作：F=あお、J=みどり（クリックでも可）</div>
+        <p class="small">注：色覚個人差や表示環境により結果は揺れます。</p>
+      </div>`
+    ],
+    show_clickable_nav: true,
+    button_label_next: 'スタート'
+  };
+
+  let currentKeyHandler = null;
+
+  const trial = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: function(){
+      const hue = jsPsych.timelineVariable('hue');
+      const color = hueToCSS(hue);
+      return `
+        <div style="text-align:center">
+          <div class="color-box" style="background:${color}" aria-label="色見本"></div>
+          <div class="hint">これは「あお」？それとも「みどり」？（F/Jでも回答可）</div>
+        </div>
+      `;
+    },
+    choices: ['あお', 'みどり'],
+    data: { 
+      trial_tag: 'color_cat', 
+      hue: jsPsych.timelineVariable('hue'), 
+      difficulty: jsPsych.timelineVariable('difficulty') 
+    },
+    on_load: function(){
+      currentKeyHandler = (e) => {
+        const buttons = document.querySelectorAll('button.jspsych-btn');
+        if (e.key.toLowerCase() === 'f' && buttons[0]) {
+          buttons[0].click();
+        } else if (e.key.toLowerCase() === 'j' && buttons[1]) {
+          buttons[1].click();
+        }
+      };
+      document.addEventListener('keydown', currentKeyHandler);
+    },
+    on_finish: function(data){
+      if (currentKeyHandler) {
+        document.removeEventListener('keydown', currentKeyHandler);
+        currentKeyHandler = null;
+      }
+      
+      const correctLabel = labelFromHue(data.hue);
+      const respLabel = data.response === 0 ? 'あお' : 'みどり';
+      data.correct = (respLabel === correctLabel);
+    }
+  };
+
+  const timeline = [];
+  timeline.push(intro);
+  timeline.push({ timeline: [trial], timeline_variables: trials });
+  jsPsych.run(timeline);
+</script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Masked Repetition vs Unrelated Priming Task</title>
+  <!-- jsPsych -->
+  <script src="https://unpkg.com/jspsych@7.3.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2"></script>
+  <link href="https://unpkg.com/jspsych@7.3.3/css/jspsych.css" rel="stylesheet" type="text/css" />
+</head>
+<body></body>
+<script>
+// initialize jsPsych
+const jsPsych = initJsPsych({
+  on_finish: () => jsPsych.data.displayData()
+});
+
+// timeline
+const timeline = [];
+
+// Instructions
+timeline.push({
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: `<p>これからマスクド・プライミング課題を行います。</p>
+             <p>プライム（隠された単語）の後にターゲット単語が表示されます。</p>
+             <p>英語として実在する単語の場合はFキー、非実在語の場合はJキーを押してください。</p>
+             <p>準備ができたらスペースキーを押してください。</p>`,
+  choices: [' ']
+});
+
+// Define stimuli: repetition, unrelated, nonword
+const primeTargetPairs = [
+  // Repetition (real words)
+  { prime: 'dog',    target: 'dog',    condition: 'repetition' },
+  { prime: 'cat',    target: 'cat',    condition: 'repetition' },
+  { prime: 'bread',  target: 'bread',  condition: 'repetition' },
+  { prime: 'book',   target: 'book',   condition: 'repetition' },
+  { prime: 'chair',  target: 'chair',  condition: 'repetition' },
+  // Unrelated (real words)
+  { prime: 'dog',    target: 'cat',    condition: 'unrelated' },
+  { prime: 'cat',    target: 'dog',    condition: 'unrelated' },
+  { prime: 'bread',  target: 'chair',  condition: 'unrelated' },
+  { prime: 'book',   target: 'dog',    condition: 'unrelated' },
+  { prime: 'chair',  target: 'cat',    condition: 'unrelated' },
+  // Nonword trials
+  { prime: 'narp',   target: 'flib',   condition: 'nonword' },
+  { prime: 'glorp',  target: 'blat',   condition: 'nonword' },
+  { prime: 'snarp',  target: 'plim',   condition: 'nonword' },
+  { prime: 'flim',   target: 'norp',   condition: 'nonword' },
+  { prime: 'slaf',   target: 'trom',   condition: 'nonword' }
+];
+
+// Trial procedure
+const trial = {
+  timeline: [
+    // fixation
+    { type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="font-size:36px; text-align:center; line-height:1.5;"><span style="display:inline-block; width:200px; text-align:center;">+</span></div>',
+      choices: 'NO_KEYS',
+      trial_duration: 500,
+      prompt: '<p style="visibility:hidden;">実在語ならFキー，非実在語ならJキーを押してください。</p>'
+    },
+    // forward mask
+    { type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="font-size:36px; text-align:center; line-height:1.5;"><span style="display:inline-block; width:200px; text-align:center;">#######</span></div>',
+      choices: 'NO_KEYS',
+      trial_duration: 500,
+      prompt: '<p style="visibility:hidden;">実在語ならFキー，非実在語ならJキーを押してください。</p>'
+    },
+    // prime (brief)
+    { type: jsPsychHtmlKeyboardResponse,
+      stimulus: () => `<div style="font-size:36px; text-align:center; line-height:1.5;"><span style="display:inline-block; width:200px; text-align:center;">${jsPsych.timelineVariable('prime')}</span></div>`,
+      choices: 'NO_KEYS',
+      trial_duration: 40,
+      prompt: '<p style="visibility:hidden;">実在語ならFキー，非実在語ならJキーを押してください。</p>'
+    },
+    // backward mask
+    { type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="font-size:36px; text-align:center; line-height:1.5;"><span style="display:inline-block; width:200px; text-align:center;">#######</span></div>',
+      choices: 'NO_KEYS',
+      trial_duration: 50,
+      prompt: '<p style="visibility:hidden;">実在語ならFキー，非実在語ならJキーを押してください。</p>'
+    },
+    // target & lexical decision
+    { type: jsPsychHtmlKeyboardResponse,
+      stimulus: () => `<div style="font-size:36px; text-align:center; line-height:1.5;"><span style="display:inline-block; width:200px; text-align:center;">${jsPsych.timelineVariable('target')}</span></div>`,
+      choices: ['f','j'],
+      prompt: '<p>実在語ならFキー，非実在語ならJキーを押してください。</p>',
+      data: { condition: jsPsych.timelineVariable('condition') }
+    }
+  ],
+  timeline_variables: primeTargetPairs,
+  randomize_order: true
+};
+timeline.push(trial);
+
+// Debrief
+timeline.push({
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: () => {
+    const data = jsPsych.data.get();
+    // 実在語の正解試行のみフィルタ（Fキーを押した試行）
+    const correctRealWords = data.filter({ response: 'f' });
+    const meanRepetition = correctRealWords.filter({ condition: 'repetition' }).select('rt').mean().toFixed(1);
+    const meanUnrelated  = correctRealWords.filter({ condition: 'unrelated' }).select('rt').mean().toFixed(1);
+    const primingEffect = (meanUnrelated - meanRepetition).toFixed(1);
+
+    // 非実在語の正解試行（Jキーを押した試行）
+    const correctNonwords = data.filter({ response: 'j', condition: 'nonword' });
+    const meanNonword = correctNonwords.select('rt').mean().toFixed(1);
+
+    return `<p>課題終了です。</p>
+            <p>【実在語】</p>
+            <p>Repetition条件の平均RT: ${meanRepetition} ms</p>
+            <p>Unrelated条件の平均RT: ${meanUnrelated} ms</p>
+            <p>プライミング効果: ${primingEffect} ms</p>
+            <p>【非実在語】</p>
+            <p>Nonword条件の平均RT: ${meanNonword} ms</p>
+            <p>ご協力ありがとうございました。スペースキーで終了します。</p>`;
+  },
+  choices: [' ']
+});
+
+// start
+jsPsych.run(timeline);
+</script>
+</html>

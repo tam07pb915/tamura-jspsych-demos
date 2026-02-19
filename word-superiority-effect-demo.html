@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Word Superiority Effect Demo</title>
+    <script src="https://unpkg.com/jspsych@7.3.4"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
+    <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
+    <style>
+        .stimulus-container {
+            font-family: 'Courier New', monospace;
+            font-size: 48px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mask {
+            letter-spacing: 8px;
+        }
+
+        .response-prompt {
+            font-size: 32px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body></body>
+<script>
+
+// 実験の初期化
+const jsPsych = initJsPsych({
+    on_finish: function() {
+        jsPsych.data.displayData();
+    }
+});
+
+// 刺激の定義（Reicher-Wheeler型）
+const stimuli = {
+    // Word条件: 実在する単語（位置を均等に分散）
+    words: [
+        // 位置0（先頭）
+        { string: 'WORK', position: 0, target: 'W', foil: 'F', type: 'word' },
+        { string: 'BEST', position: 0, target: 'B', foil: 'R', type: 'word' },
+        { string: 'JUMP', position: 0, target: 'J', foil: 'P', type: 'word' },
+        // 位置1
+        { string: 'CARD', position: 1, target: 'A', foil: 'O', type: 'word' },
+        { string: 'DARK', position: 1, target: 'A', foil: 'E', type: 'word' },
+        { string: 'COIN', position: 1, target: 'O', foil: 'A', type: 'word' },
+        // 位置2
+        { string: 'FISH', position: 2, target: 'S', foil: 'L', type: 'word' },
+        { string: 'COIN', position: 2, target: 'I', foil: 'E', type: 'word' },
+        { string: 'WORD', position: 2, target: 'R', foil: 'N', type: 'word' },
+        // 位置3（末尾）
+        { string: 'WORK', position: 3, target: 'K', foil: 'T', type: 'word' },
+        { string: 'CARD', position: 3, target: 'D', foil: 'T', type: 'word' },
+        { string: 'MILK', position: 3, target: 'K', foil: 'D', type: 'word' }
+    ],
+
+    // Nonword条件: 発音可能擬語（語様性を保つ）
+    nonwords: [
+        // 位置0
+        { string: 'MARD', position: 0, target: 'M', foil: 'B', type: 'nonword' },
+        { string: 'FERK', position: 0, target: 'F', foil: 'W', type: 'nonword' },
+        { string: 'PIND', position: 0, target: 'P', foil: 'B', type: 'nonword' },
+        // 位置1
+        { string: 'TABE', position: 1, target: 'A', foil: 'O', type: 'nonword' },
+        { string: 'NUST', position: 1, target: 'U', foil: 'A', type: 'nonword' },
+        { string: 'GORK', position: 1, target: 'O', foil: 'A', type: 'nonword' },
+        // 位置2
+        { string: 'SLINT', position: 2, target: 'I', foil: 'E', type: 'nonword' },
+        { string: 'BORM', position: 2, target: 'R', foil: 'N', type: 'nonword' },
+        { string: 'DIFT', position: 2, target: 'F', foil: 'L', type: 'nonword' },
+        // 位置3
+        { string: 'FERM', position: 3, target: 'M', foil: 'T', type: 'nonword' },
+        { string: 'PLIN', position: 3, target: 'N', foil: 'D', type: 'nonword' },
+        { string: 'GALK', position: 3, target: 'K', foil: 'T', type: 'nonword' }
+    ],
+
+    // Single letter条件: 同じターゲット文字を使用
+    single: [
+        { string: 'W', position: 0, target: 'W', foil: 'F', type: 'single' },
+        { string: 'A', position: 0, target: 'A', foil: 'O', type: 'single' },
+        { string: 'S', position: 0, target: 'S', foil: 'L', type: 'single' },
+        { string: 'K', position: 0, target: 'K', foil: 'T', type: 'single' },
+        { string: 'B', position: 0, target: 'B', foil: 'R', type: 'single' },
+        { string: 'O', position: 0, target: 'O', foil: 'A', type: 'single' },
+        { string: 'I', position: 0, target: 'I', foil: 'E', type: 'single' },
+        { string: 'R', position: 0, target: 'R', foil: 'N', type: 'single' },
+        { string: 'D', position: 0, target: 'D', foil: 'T', type: 'single' },
+        { string: 'M', position: 0, target: 'M', foil: 'B', type: 'single' },
+        { string: 'U', position: 0, target: 'U', foil: 'A', type: 'single' },
+        { string: 'F', position: 0, target: 'F', foil: 'L', type: 'single' }
+    ]
+};
+
+// 各条件のトライアルをランダム化
+const word_trials = jsPsych.randomization.shuffle(stimuli.words);
+const nonword_trials = jsPsych.randomization.shuffle(stimuli.nonwords);
+const single_trials = jsPsych.randomization.shuffle(stimuli.single);
+
+// 全トライアルを結合してシャッフル
+const all_trials = jsPsych.randomization.shuffle(
+    [...word_trials, ...nonword_trials, ...single_trials]
+);
+
+// イントロダクション
+const welcome = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: `
+        <div style="max-width: 600px; margin: auto; text-align: left;">
+        <h1>単語優位性効果のデモ実験</h1>
+        <p>この実験では、文字列が短時間表示されます。</p>
+        <p>その後、<strong>「○文字目」</strong>と表示され、<br>
+        その位置にあった文字を2つの選択肢から選んでください。</p>
+        <p>例：<br>
+        「WORK」と表示された後、「3文字目」と出たら、<br>
+        3番目の文字「R」を「R」と「N」の選択肢から選びます。</p>
+        <p><strong>重要：</strong>文字列は完全な形で表示されますが、<br>
+        とても短い時間なので注意して見てください。</p>
+        <p>できるだけ速く、正確に答えてください。</p>
+        <p><strong>スペースキーを押して開始</strong></p>
+        </div>
+    `,
+    choices: [' ']
+};
+
+// トライアルを生成する関数（Reicher-Wheeler型）
+function createTrial(stimulus) {
+    const timeline = [];
+
+    // マスクを事前に生成
+    const mask_length = stimulus.string.length;
+    const mask = '#'.repeat(mask_length);
+
+    // 位置キューのテキストを生成
+    const position_label = `${stimulus.position + 1}文字目`;
+
+    // 固視点
+    timeline.push({
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: `
+            <div class="stimulus-container">+</div>
+            <div style="font-size: 24px; margin-top: 10px; visibility: hidden;">${position_label}</div>
+            <div style="height: 130px;"></div>
+        `,
+        choices: "NO_KEYS",
+        trial_duration: 500
+    });
+
+    // 前置マスク（forward mask）
+    timeline.push({
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: `
+            <div class="stimulus-container mask">${mask}</div>
+            <div style="font-size: 24px; margin-top: 10px; visibility: hidden;">${position_label}</div>
+            <div style="height: 130px;"></div>
+        `,
+        choices: "NO_KEYS",
+        trial_duration: 300
+    });
+
+    // 刺激提示（完全な文字列を表示）
+    timeline.push({
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: `
+            <div class="stimulus-container">${stimulus.string}</div>
+            <div style="font-size: 24px; margin-top: 10px; visibility: hidden;">${position_label}</div>
+            <div style="height: 130px;"></div>
+        `,
+        choices: "NO_KEYS",
+        trial_duration: 40  // 短時間提示
+    });
+
+    // 後置マスク（backward mask）+ 位置キュー
+    timeline.push({
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: `
+            <div class="stimulus-container mask">${mask}</div>
+            <div style="font-size: 24px; margin-top: 10px; font-weight: bold;">${position_label}</div>
+            <div style="height: 130px;"></div>
+        `,
+        choices: "NO_KEYS",
+        trial_duration: 500
+    });
+
+    // 2択反応（位置キューと同時提示）
+    // ターゲットとfoilの位置をランダム化
+    const left_is_target = Math.random() < 0.5;
+    const left_char = left_is_target ? stimulus.target : stimulus.foil;
+    const right_char = left_is_target ? stimulus.foil : stimulus.target;
+    const correct_key = left_is_target ? 'f' : 'j';
+
+    timeline.push({
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: `
+            <div class="stimulus-container mask">${mask}</div>
+            <div style="font-size: 24px; margin-top: 10px; font-weight: bold;">${position_label}</div>
+            <div class="response-prompt">
+                <span style="margin-right: 100px;">${left_char}</span>
+                <span>${right_char}</span>
+            </div>
+            <p style="margin-top: 20px;">
+                <span style="margin-right: 100px;"><strong>F</strong>キー</span>
+                <span><strong>J</strong>キー</span>
+            </p>
+        `,
+        choices: ['f', 'j'],
+        data: {
+            condition: stimulus.type,
+            string: stimulus.string,
+            position: stimulus.position,
+            target_letter: stimulus.target,
+            foil_letter: stimulus.foil,
+            left_char: left_char,
+            right_char: right_char,
+            correct_response: correct_key,
+            left_is_target: left_is_target
+        },
+        on_finish: function(data) {
+            data.correct = data.response === data.correct_response;
+        }
+    });
+
+    // フィードバック
+    timeline.push({
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: function() {
+            const last_trial = jsPsych.data.get().last(1).values()[0];
+            if (last_trial.correct) {
+                return '<div style="font-size: 36px; color: green;">正解！</div>';
+            } else {
+                return '<div style="font-size: 36px; color: red;">不正解</div>';
+            }
+        },
+        choices: "NO_KEYS",
+        trial_duration: 500
+    });
+
+    return timeline;
+}
+
+// 練習トライアル
+const practice = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: `
+        <div style="max-width: 600px; margin: auto;">
+        <h2>練習</h2>
+        <p>まず練習を行います。</p>
+        <p><strong>スペースキーを押して開始</strong></p>
+        </div>
+    `,
+    choices: [' ']
+};
+
+const practice_trials = [
+    { string: 'HELP', position: 2, target: 'L', foil: 'R', type: 'practice' },
+    { string: 'NOST', position: 1, target: 'O', foil: 'A', type: 'practice' },
+    { string: 'T', position: 0, target: 'T', foil: 'F', type: 'practice' }
+];
+
+// 本実験開始
+const start_main = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: `
+        <div style="max-width: 600px; margin: auto;">
+        <h2>本実験</h2>
+        <p>それでは本実験を開始します。</p>
+        <p>全部で${all_trials.length}トライアルあります。</p>
+        <p><strong>スペースキーを押して開始</strong></p>
+        </div>
+    `,
+    choices: [' ']
+};
+
+// 終了画面
+const debrief = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: function() {
+        // 練習試行を除外して集計
+        const main_trials = jsPsych.data.get().filter({correct: true})
+            .filter(trial => trial.condition !== 'practice');
+
+        const word_trials = main_trials.filter({condition: 'word'});
+        const nonword_trials = main_trials.filter({condition: 'nonword'});
+        const single_trials = main_trials.filter({condition: 'single'});
+
+        const word_acc = Math.round(word_trials.count() / stimuli.words.length * 100);
+        const nonword_acc = Math.round(nonword_trials.count() / stimuli.nonwords.length * 100);
+        const single_acc = Math.round(single_trials.count() / stimuli.single.length * 100);
+
+        return `
+        <div style="max-width: 600px; margin: auto; text-align: left;">
+          <h1>実験終了</h1>
+
+          <h2>結果</h2>
+          <p><strong>単語条件:</strong> ${word_acc}% 正解</p>
+          <p><strong>非単語条件:</strong> ${nonword_acc}% 正解</p>
+          <p><strong>単独文字条件:</strong> ${single_acc}% 正解</p>
+
+          <br>
+
+          <h3>単語優位性効果（Word Superiority Effect）</h3>
+
+          <p>
+            単語優位性効果とは，同じ文字であっても，
+            <strong>意味のある単語の中に含まれているときの方が，
+            無意味な文字列（非単語）の中にあるときよりも，
+            正確に同定されやすい</strong>という現象です。
+          </p>
+
+          <p>
+            この現象は，
+            語彙レベルの知識が文字認識に影響を与える
+            <strong>トップダウン処理</strong>の存在を示唆しています。
+          </p>
+
+          <p>
+            多くの研究では，
+            単語条件が非単語条件より高い成績を示すことが報告されています。
+            一方で，単独文字条件の成績は，
+            課題の難易度や呈示条件によって変化します。
+          </p>
+
+          <p>
+            これらを踏まえて，
+            <strong>自分の結果がどの条件関係に当てはまるか</strong>を
+            考えてみてください。
+          </p>
+
+          <p><strong>スペースキーを押してデータを表示</strong></p>
+        </div>
+        `;
+    },
+    choices: [' ']
+};
+
+// タイムラインの構築
+let timeline = [];
+timeline.push(welcome);
+timeline.push(practice);
+practice_trials.forEach(trial => {
+    timeline = timeline.concat(createTrial(trial));
+});
+timeline.push(start_main);
+all_trials.forEach(trial => {
+    timeline = timeline.concat(createTrial(trial));
+});
+timeline.push(debrief);
+
+// 実験の実行
+jsPsych.run(timeline);
+
+</script>
+</html>
