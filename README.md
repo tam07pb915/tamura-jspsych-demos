@@ -65,3 +65,9 @@ MIT License（詳細は LICENSE を参照）。
 授業資料や発表資料等で参照したい場合は，以下の形式を目安にしてください。
 
 Tamura, Y. (2026). tamura-jspsych-demos: Psycholinguistics experiment demos built with jsPsych (Version 0.1). GitHub repository.
+
+## Note for English speakers
+
+Currently, this repository and the demo site are available only in Japanese. An English version is planned for future development.
+
+In the meantime, the demos themselves may still be usable regardless of language, as they primarily involve interactive experimental tasks.
