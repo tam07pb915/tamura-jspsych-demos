@@ -9,3 +9,6 @@ firebase.json
 # Secrets
 .env
 .env.local
+
+# Local nested checkout
+tamura-jspsych-demos/
