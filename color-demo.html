@@ -6,6 +6,7 @@
   <title>色カテゴリ判断デモ（青–緑の境界）</title>
   <script src="https://unpkg.com/jspsych@7.3.3"></script>
   <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.2.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2"></script>
   <script src="https://unpkg.com/@jspsych/plugin-instructions@1.1.4"></script>
   <link href="https://unpkg.com/jspsych@7.3.3/css/jspsych.css" rel="stylesheet" />
   <style>
@@ -36,25 +37,7 @@
   const jsPsych = initJsPsych({
     display_element: 'jspsych-target',
     on_finish: function() {
-      const trials = jsPsych.data.get().filter({trial_type: 'html-button-response', trial_tag: 'color_cat'}).values();
-      const easy = trials.filter(t => t.difficulty === 'easy').map(t => t.rt);
-      const boundary = trials.filter(t => t.difficulty === 'boundary').map(t => t.rt);
-      const easyM = Math.round(mean(easy)), easySD = Math.round(sd(easy));
-      const bM = Math.round(mean(boundary)), bSD = Math.round(sd(boundary));
-      const wrap = document.createElement('div');
-      wrap.className = 'summary';
-      wrap.innerHTML = `
-        <h3>結果まとめ</h3>
-        <div>試行数：${trials.length}（境界 ${boundary.length}、簡単 ${easy.length}）</div>
-        <div>平均反応時間：境界 ${bM} ms（±${bSD}）、簡単 ${easyM} ms（±${easySD}）</div>
-        <div class="small">境界色のほうが遅ければ，カテゴリ境界付近で判断に時間がかかる傾向のデモになっています。</div>
-        <div style="margin-top:10px"><button id="dlbtn" class="jspsych-btn">CSVをダウンロード</button></div>
-      `;
-      document.getElementById('jspsych-target').appendChild(wrap);
-      document.getElementById('dlbtn').addEventListener('click', () => {
-        const csv = jsPsych.data.get().csv();
-        download('color_category_demo.csv', csv);
-      });
+      jsPsych.data.displayData();
     }
   });
 
@@ -137,6 +120,35 @@
   const timeline = [];
   timeline.push(intro);
   timeline.push({ timeline: [trial], timeline_variables: trials });
+  timeline.push({
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: function() {
+      const trialData = jsPsych.data.get().filter({trial_type: 'html-button-response', trial_tag: 'color_cat'}).values();
+      const easy = trialData.filter(t => t.difficulty === 'easy').map(t => t.rt);
+      const boundary = trialData.filter(t => t.difficulty === 'boundary').map(t => t.rt);
+      const easyM = Math.round(mean(easy)), easySD = Math.round(sd(easy));
+      const bM = Math.round(mean(boundary)), bSD = Math.round(sd(boundary));
+
+      return `
+        <div class="summary">
+          <h3>結果まとめ</h3>
+          <div>試行数：${trialData.length}（境界 ${boundary.length}、簡単 ${easy.length}）</div>
+          <div>平均反応時間：境界 ${bM} ms（±${bSD}）、簡単 ${easyM} ms（±${easySD}）</div>
+          <div class="small">境界色のほうが遅ければ，カテゴリ境界付近で判断に時間がかかる傾向のデモになっています。</div>
+          <div style="margin-top:10px"><button id="dlbtn" class="jspsych-btn">CSVをダウンロード</button></div>
+          <p><strong>スペースキーを押すと，実験の生データが表示されます。</strong></p>
+          <p><a class="jspsych-btn" href="index.html" style="display: inline-block; text-decoration: none;">トップページに戻る</a></p>
+        </div>
+      `;
+    },
+    choices: [' '],
+    on_load: function() {
+      document.getElementById('dlbtn').addEventListener('click', () => {
+        const csv = jsPsych.data.get().csv();
+        download('color_category_demo.csv', csv);
+      });
+    }
+  });
   jsPsych.run(timeline);
 </script>
 </body>

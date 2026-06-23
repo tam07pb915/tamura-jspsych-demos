@@ -22,28 +22,11 @@
   // 1. jsPsychの初期化
   const jsPsych = initJsPsych({
     on_finish: function() {
-      // 5. 結果の集計と表示
-      jsPsych.data.get().filter({task: 'response', correct: true});
-      const congruent_rt = jsPsych.data.get().filter({condition: 'congruent', correct: true}).select('rt').mean();
-      const incongruent_rt = jsPsych.data.get().filter({condition: 'incongruent', correct: true}).select('rt').mean();
-
-      const results_html = `
-        <div>
-          <h2>実験結果</h2>
-          <p>（正しく回答された試行のみの平均反応時間）</p>
-          <p style="font-size: 28px; color: blue;">
-            【一致条件】の平均反応時間: <strong>${congruent_rt.toFixed(2)} ミリ秒</strong>
-          </p>
-          <p style="font-size: 28px; color: red;">
-            【不一致条件】の平均反応時間: <strong>${incongruent_rt.toFixed(2)} ミリ秒</strong>
-          </p>
-          <br>
-          <p>仮説通りなら、【一致条件】の方が速くなっているはずです。</p>
-          <p>これは、「過去＝左」「未来＝右」という対応付けが自動的に働いた証拠かもしれません。</p>
-          <p>実験は終了です。ブラウザを閉じてください。</p>
-        </div>
-      `;
-      jsPsych.getDisplayElement().innerHTML = results_html;
+      const displayElement = jsPsych.getDisplayElement();
+      displayElement.style.display = 'block';
+      displayElement.style.height = 'auto';
+      displayElement.style.fontSize = '16px';
+      jsPsych.data.displayData();
     }
   });
 
@@ -144,6 +127,35 @@
     repetitions: 4
   };
   timeline.push(trial_procedure);
+
+  // 5. 結果の集計と表示
+  const debrief = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: function() {
+      const congruent_rt = jsPsych.data.get().filter({condition: 'congruent', correct: true}).select('rt').mean();
+      const incongruent_rt = jsPsych.data.get().filter({condition: 'incongruent', correct: true}).select('rt').mean();
+
+      return `
+        <div>
+          <h2>実験結果</h2>
+          <p>（正しく回答された試行のみの平均反応時間）</p>
+          <p style="font-size: 28px; color: blue;">
+            【一致条件】の平均反応時間: <strong>${congruent_rt.toFixed(2)} ミリ秒</strong>
+          </p>
+          <p style="font-size: 28px; color: red;">
+            【不一致条件】の平均反応時間: <strong>${incongruent_rt.toFixed(2)} ミリ秒</strong>
+          </p>
+          <br>
+          <p>仮説通りなら、【一致条件】の方が速くなっているはずです。</p>
+          <p>これは、「過去＝左」「未来＝右」という対応付けが自動的に働いた証拠かもしれません。</p>
+          <p><strong>スペースキーを押すと，実験の生データが表示されます。</strong></p>
+          <p><a class="jspsych-btn" href="index.html" style="display: inline-block; text-decoration: none;">トップページに戻る</a></p>
+        </div>
+      `;
+    },
+    choices: [' ']
+  };
+  timeline.push(debrief);
 
   // 実験の実行
   jsPsych.run(timeline);

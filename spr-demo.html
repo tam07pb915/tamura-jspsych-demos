@@ -306,7 +306,7 @@ const jsPsych = initJsPsych({
 
   // End of experiment message with analysis
   var end_of_experiment = {
-    type: jsPsychHtmlButtonResponse,
+    type: jsPsychHtmlKeyboardResponse,
     stimulus: function() {
       // 分析結果を取得
       var allData = jsPsych.data.get();
@@ -385,10 +385,11 @@ const jsPsych = initJsPsych({
           <p><strong>Reference:</strong> Trueswell, J. C., Tanenhaus, M. K., &amp; Garnsey, S. M. (1994). Semantic influences on parsing: Use of thematic role information in syntactic ambiguity resolution. <em>Journal of Memory and Language, 33</em>(3), 285-318.</p>
         </div>
 
-        <p>Your full data will be shown on the next screen.</p>
+        <p><strong>Press the space bar to show your raw trial data.</strong></p>
+        <p><a class="jspsych-btn" href="index.html" style="display: inline-block; text-decoration: none;">Back to top page</a></p>
       `;
     },
-    choices: ['See Results']
+    choices: [' ']
   };
 
   // Full timeline
