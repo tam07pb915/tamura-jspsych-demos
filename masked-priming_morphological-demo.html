@@ -258,11 +258,20 @@ timeline.push({
             <p>実在語判断の正答率: <b>${accuracyRealWords}%</b> (${correctRealWordsAcc}/${totalRealWords})</p>
             <hr>
             <p><b>形態的プライミング効果: ${primingEffect} ms</b></p>
-            <p>(形態的関連条件のRTが非関連条件より短ければ、マスクされたプライムが無意識に語幹へ分解されたことを示唆します)</p>
+            <p>(形態的関連条件のRTが非関連条件より短ければ、マスクされたプライムがターゲット語の処理を促進した可能性があります)</p>
             <br>
             <p>【非実在語の判断結果】(16語)</p>
             <p>Nonword条件の平均反応時間: ${meanNonword} ms</p>
             <p>非実在語判断の正答率: <b>${accuracyNonwords}%</b> (${correctNonwordsAcc}/${totalNonwords})</p>
+            <div style="max-width: 760px; margin: 24px auto; padding: 16px 18px; text-align: left; background: #f8f9fa; border-left: 4px solid #1a3a52;">
+              <h3>この実験の種明かし</h3>
+              <p><strong>何を調べていたか：</strong>この課題では，派生語のようなプライム（例：hunter）が，語幹にあたるターゲット（HUNT）の判断を速くするかを調べていました。</p>
+              <p><strong>操作した条件：</strong>形態的に関連するペア（hunter → HUNT）と，関連しないペア（window → HUNT）を比べています。List A と List B は，ターゲット語そのものの違いが条件差に見えないようにするためのカウンターバランスです。</p>
+              <p><strong>マスクの役割：</strong>プライムは ####### に挟まれて40ミリ秒だけ表示されます。参加者がプライムを意識的な手がかりとして使いにくい状況で，語形や形態的関連性がどの程度早く働くかを見ています。</p>
+              <p><strong>結果の読み方：</strong>形態的関連条件が非関連条件より速ければ，ターゲットを見る前にプライムの語形・語幹に関する情報が処理され，ターゲット判断を助けた可能性があります。</p>
+              <p><strong>教育用デモとして：</strong>この簡略版だけでは，正書法的な似ている形の効果，意味の効果，形態分解そのものを完全には切り分けられません。授業では，実験デザイン上なぜ統制条件やカウンターバランスが必要になるかを考える材料として使ってください。</p>
+              <p><strong>参考文献：</strong>Rastle, K., Davis, M. H., &amp; New, B. (2004). The broth in my brother's brothel: Morpho-orthographic segmentation in visual word recognition. <em>Psychonomic Bulletin &amp; Review, 11</em>(6), 1090-1098.</p>
+            </div>
             <br>
             <p>ご協力ありがとうございました。スペースキーで終了します。</p>`;
   },
