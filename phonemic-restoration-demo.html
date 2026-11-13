@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>音声補完効果（日本語）｜心理言語学実験デモ集</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: clamp(12px, 4vw, 32px); background: #f5f7fa; color: #2c3e50; font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", Meiryo, sans-serif; line-height: 1.7; }
+    main { max-width: 760px; margin: auto; padding: clamp(16px, 5vw, 44px); background: #fff; border-radius: 4px; }
+    h1, h2, h3 { color: #1a3a52; }
+    h1 { font-size: clamp(1.5rem, 5vw, 2rem); margin-bottom: .5rem; }
+    h2 { margin: 0 0 .75rem; font-size: 1.3rem; }
+    h3 { font-size: 1rem; margin: 0 0 .25rem; }
+    a { color: #205777; }
+    section { border-top: 1px solid #dee2e6; margin-top: 1.5rem; padding-top: 1.25rem; }
+    .clips { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 1rem; }
+    audio { display: block; width: 100%; max-width: 320px; }
+    details { margin-top: .85rem; }
+    summary { cursor: pointer; color: #205777; padding: .4rem 0; }
+  </style>
+</head>
+<body>
+  <main>
+    <nav><a href="./">デモ一覧に戻る</a></nav>
+    <h1>音声補完効果（日本語）</h1>
+    <p>A，Bの順に聴き比べてください。どんな語に聞こえましたか。途中の音は聞こえた感じがしましたか。</p>
+
+    <section aria-labelledby="example-1">
+      <h2 id="example-1">例1</h2>
+      <div class="clips">
+        <div><h3>音声A</h3><audio controls preload="none" aria-label="例1の音声A" src="phonemic-audio/1-a.wav"></audio></div>
+        <div><h3>音声B</h3><audio controls preload="none" aria-label="例1の音声B" src="phonemic-audio/1-b.wav"></audio></div>
+      </div>
+      <details>
+        <summary>種明かしと原音</summary>
+        <p>元の語は「パン」です。Aは音声の一部をノイズに置き換え，Bは同じ箇所を無音にしたものです。</p>
+        <h3>音声C（原音）</h3>
+        <audio controls preload="none" aria-label="例1の音声C（原音）" src="phonemic-audio/1-c.wav"></audio>
+      </details>
+    </section>
+
+    <section aria-labelledby="example-2">
+      <h2 id="example-2">例2</h2>
+      <div class="clips">
+        <div><h3>音声A</h3><audio controls preload="none" aria-label="例2の音声A" src="phonemic-audio/2-a.wav"></audio></div>
+        <div><h3>音声B</h3><audio controls preload="none" aria-label="例2の音声B" src="phonemic-audio/2-b.wav"></audio></div>
+      </div>
+      <details>
+        <summary>種明かしと原音</summary>
+        <p>元の語は「ペン」です。Aは音声の一部をノイズに置き換え，Bは同じ箇所を無音にしたものです。</p>
+        <h3>音声C（原音）</h3>
+        <audio controls preload="none" aria-label="例2の音声C（原音）" src="phonemic-audio/2-c.wav"></audio>
+      </details>
+    </section>
+    <section aria-labelledby="explanation">
+      <h2 id="explanation">音声補完効果とは</h2>
+      <p>音声の一部がノイズに置き換わっていても，もとの音が聞こえたように感じることがあります。語が何か分かったかと，その箇所の音まで聞こえた感じがしたかを，分けて振り返ってみましょう。</p>
+      <p><a href="https://pubmed.ncbi.nlm.nih.gov/5409744/">参考文献　Warren（1970）</a></p>
+    </section>
+  </main>
+  <script>
+    const clips = [...document.querySelectorAll('audio')];
+    for (const clip of clips) {
+      clip.addEventListener('play', () => {
+        for (const other of clips) {
+          if (other !== clip) other.pause();
+        }
+      });
+    }
+    for (const reveal of document.querySelectorAll('details')) {
+      reveal.addEventListener('toggle', () => {
+        if (!reveal.open) reveal.querySelector('audio').pause();
+      });
+    }
+  </script>
+</body>
+</html>
